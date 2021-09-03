@@ -1,0 +1,57 @@
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: QA
+  region: us-east-1
+  version: "1.21"
+vpc:
+  id: vpc-07057b5e8f2c582c0
+  subnets:
+    private:
+      private-QA1:
+        id: subnet-056af5efc1e89e698
+      privateQA2:
+        id: subnet-0a12f612e00e615fc
+    public:
+      public-QA:
+        id: subnet-069a992ab8a86bde1
+      public-QA2:
+        id: subnet-0abcc25223cb58b9d
+nodeGroups:
+- name: general-v2
+  labels:
+    role: general
+  instanceType: t3.medium
+  desiredCapacity: 1
+  privateNetworking: true
+  ssh:
+    publicKeyName: qa
+  subnets:
+  - private-QA1
+  - privateQA2
+- name: spot-v2
+  labels:
+    role: spot
+  minSize: 1
+  maxSize: 1
+  instancesDistribution:
+    instanceTypes:
+    - t3.medium
+    onDemandBaseCapacity: 0
+    onDemandPercentageAboveBaseCapacity: 0
+    spotInstancePools: 20
+  privateNetworking: true
+  taints:
+    spot: "true:NoSchedule"
+  subnets:
+  - private-QA1
+  - privateQA2
+managedNodeGroups:
+- name: managed
+  instanceType: t3.medium
+  desiredCapacity: 1
+  privateNetworking: true
+  subnets:
+    - private-QA1
+    - privateQA2
